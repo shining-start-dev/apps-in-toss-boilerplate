@@ -15,6 +15,7 @@ type HomePageProps = {
   isAppsInTossWebView: boolean
   isLoading: boolean
   isMutating: boolean
+  isDebugToolsEnabled: boolean
   onRefresh: () => void
   onRunAppLogin: () => void
   onClearAuthToken: () => void
@@ -29,6 +30,7 @@ export function HomePage({
   isAppsInTossWebView,
   isLoading,
   isMutating,
+  isDebugToolsEnabled,
   onRefresh,
   onRunAppLogin,
   onClearAuthToken,
@@ -131,9 +133,11 @@ export function HomePage({
               <Button color="primary" variant="weak" onClick={() => void onRefresh()}>
                 상태 새로고침
               </Button>
-              <Button color="primary" variant="weak" onClick={() => navigate('/debug')}>
-                디버그로 이동
-              </Button>
+              {isDebugToolsEnabled ? (
+                <Button color="primary" variant="weak" onClick={() => navigate('/debug')}>
+                  디버그로 이동
+                </Button>
+              ) : null}
             </div>
           </InfoCard>
         </div>

@@ -14,6 +14,7 @@ type IntroPageProps = {
   isLoading: boolean
   isMutating: boolean
   isAppsInTossWebView: boolean
+  isDebugToolsEnabled: boolean
   onRunAppLogin: () => void
   onClearAuthToken: () => void
 }
@@ -27,6 +28,7 @@ export function IntroPage({
   isLoading,
   isMutating,
   isAppsInTossWebView,
+  isDebugToolsEnabled,
   onRunAppLogin,
   onClearAuthToken,
 }: IntroPageProps) {
@@ -101,9 +103,11 @@ export function IntroPage({
               <Button color="primary" variant="weak" onClick={() => navigate('/home')}>
                 샘플 홈 보기
               </Button>
-              <Button color="primary" variant="weak" onClick={() => navigate('/debug')}>
-                디버그 도구
-              </Button>
+              {isDebugToolsEnabled ? (
+                <Button color="primary" variant="weak" onClick={() => navigate('/debug')}>
+                  디버그 도구
+                </Button>
+              ) : null}
             </div>
           </InfoCard>
 

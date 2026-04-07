@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import {
+  AUTH_TOKEN_STORAGE_KEY,
   clearAuthToken,
+  getRuntimeContextLabel,
   isAuthFlowCancelledError,
   readAuthToken,
   runAuthJoinFlow,
@@ -14,6 +16,12 @@ import {
   writeDebugRuntimeMode,
 } from './debugRuntimeMode'
 import { ENABLE_DEBUG_TOOLS } from './debugTools'
+import {
+  clearAllDebugStorage,
+  clearDebugStorageKey,
+  getDebugStorageEntries,
+  type DebugStorageEntry,
+} from './debugStorage'
 import { IntroPage } from './pages/IntroPage'
 import { HomePage } from './pages/HomePage'
 import { DebugPage } from './pages/DebugPage'
@@ -46,16 +54,31 @@ export default function App() {
   const [authTokenPreview, setAuthTokenPreview] = useState<string | null>(null)
   const [authErrorMessage, setAuthErrorMessage] = useState<string | null>(null)
   const [debugRuntimeMode, setDebugRuntimeMode] = useState<DebugRuntimeMode>('auto')
+  const [runtimeContextLabel, setRuntimeContextLabel] = useState('')
+  const [debugStorageEntries, setDebugStorageEntries] = useState<DebugStorageEntry[]>([])
+  const [debugStorageErrorMessage, setDebugStorageErrorMessage] = useState<string | null>(null)
 
-  async function refreshAuthState() {
-    setIsLoading(true)
+  async function refreshAuthState(options: { loading?: boolean } = {}) {
+    if (options.loading !== false) {
+      setIsLoading(true)
+    }
+
     try {
       const token = await readAuthToken()
       setAuthTokenStatus(token === null ? 'empty' : 'present')
       setAuthTokenPreview(toTokenPreview(token))
       setDebugRuntimeMode(readDebugRuntimeMode())
+      setRuntimeContextLabel(getRuntimeContextLabel())
+      setDebugStorageEntries(await getDebugStorageEntries())
+      setDebugStorageErrorMessage(null)
+    } catch (error) {
+      const nextMessage =
+        error instanceof Error ? error.message : '디버그 상태를 불러오지 못했어요. 다시 시도해 주세요.'
+      setDebugStorageErrorMessage(nextMessage)
     } finally {
-      setIsLoading(false)
+      if (options.loading !== false) {
+        setIsLoading(false)
+      }
     }
   }
 
@@ -118,6 +141,51 @@ export default function App() {
     }
   }
 
+  async function handleRefreshDebugState() {
+    setIsMutating(true)
+
+    try {
+      await refreshAuthState({ loading: false })
+    } finally {
+      setIsMutating(false)
+    }
+  }
+
+  async function handleClearDebugStorageKey(key: string) {
+    setIsMutating(true)
+    setAuthErrorMessage(null)
+
+    try {
+      if (key === AUTH_TOKEN_STORAGE_KEY) {
+        await clearAuthToken()
+      } else {
+        await clearDebugStorageKey(key)
+      }
+
+      await refreshAuthState({ loading: false })
+    } catch (error) {
+      setDebugStorageErrorMessage(toErrorMessage(error))
+    } finally {
+      setIsMutating(false)
+    }
+  }
+
+  async function handleClearAllDebugStorage() {
+    setIsMutating(true)
+    setAuthErrorMessage(null)
+
+    try {
+      await clearAuthToken()
+      await clearAllDebugStorage()
+      await refreshAuthState({ loading: false })
+      navigate('/', { replace: true })
+    } catch (error) {
+      setDebugStorageErrorMessage(toErrorMessage(error))
+    } finally {
+      setIsMutating(false)
+    }
+  }
+
   const resolvedRuntimeMode = getResolvedRuntimeMode()
   const resolvedOperationalEnvironment = getResolvedOperationalEnvironment()
 
@@ -135,6 +203,7 @@ export default function App() {
             isLoading={isLoading}
             isMutating={isMutating}
             isAppsInTossWebView={isAppsInTossWebView()}
+            isDebugToolsEnabled={ENABLE_DEBUG_TOOLS}
             onRunAppLogin={() => void handleRunAppLogin()}
             onClearAuthToken={() => void handleClearAuthToken()}
           />
@@ -152,6 +221,7 @@ export default function App() {
             isAppsInTossWebView={isAppsInTossWebView()}
             isLoading={isLoading}
             isMutating={isMutating}
+            isDebugToolsEnabled={ENABLE_DEBUG_TOOLS}
             onRefresh={() => void refreshAuthState()}
             onRunAppLogin={() => void handleRunAppLogin()}
             onClearAuthToken={() => void handleClearAuthToken()}
@@ -166,15 +236,21 @@ export default function App() {
               authTokenStatus={authTokenStatus}
               authTokenPreview={authTokenPreview}
               authErrorMessage={authErrorMessage}
+              runtimeContextLabel={runtimeContextLabel}
               debugRuntimeMode={debugRuntimeMode}
               resolvedRuntimeMode={resolvedRuntimeMode}
               resolvedOperationalEnvironment={resolvedOperationalEnvironment}
+              currentPathname={location.pathname}
+              storageEntries={debugStorageEntries}
+              storageErrorMessage={debugStorageErrorMessage}
               isLoading={isLoading}
               isMutating={isMutating}
-              onRefresh={() => void refreshAuthState()}
+              onRefresh={() => void handleRefreshDebugState()}
               onRunAppLogin={() => void handleRunAppLogin()}
               onClearAuthToken={() => void handleClearAuthToken()}
               onSetDebugRuntimeMode={(mode) => void handleSetDebugRuntimeMode(mode)}
+              onClearStorageKey={(key) => void handleClearDebugStorageKey(key)}
+              onClearAllStorage={() => void handleClearAllDebugStorage()}
             />
           }
         />

@@ -1,6 +1,6 @@
 # Apps in Toss Boilerplate
 
-`timewatch-react`의 단순한 앱 구조와 `today-survey`의 성숙한 개발/운영 설정을 합쳐 만든 Apps in Toss 스타터 레포입니다.
+`time-is-gold-react`의 단순한 앱 구조와 `today-survey`의 성숙한 개발/운영 설정을 합쳐 만든 Apps in Toss 스타터 레포입니다.
 
 공식 Apps in Toss 문서 기준으로 확인한 항목:
 
@@ -17,6 +17,7 @@
 - API 클라이언트 / 환경 변수 헬퍼
 - Sentry 모니터링 초기화 템플릿
 - 인앱 디버그 툴 (`/debug`)
+- 브리지 Storage / localStorage 상태 비교 도구
 - 런타임 모드 전환 (`auto`, `live`, `dev`)
 - AI 협업 규칙 파일 (`AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`)
 - Vitest / ESLint / Prettier
@@ -77,6 +78,7 @@ src/
   utils/              env, error, appError
   auth.ts             appLogin + token storage
   analytics.ts        Analytics bridge wrapper
+  debugStorage.ts     bridge/local storage inspector
   debugRuntimeMode.ts 디버그 런타임 전환
   monitoring.ts       Sentry bootstrap
   providers.tsx       TDS provider selection
@@ -88,7 +90,7 @@ src/
 1. `granite.config.ts`의 `appName`과 브랜드 정보를 바꾸세요.
 2. `src/api/endpoints.ts`의 엔드포인트를 실제 서비스용으로 바꾸세요.
 3. `src/pages/HomePage.tsx`를 도메인 대시보드로 교체하세요.
-4. `src/pages/DebugPage.tsx`에 서비스별 디버그 액션을 추가하세요.
+4. `src/pages/DebugPage.tsx`와 `src/debugStorage.ts`에 서비스별 디버그 액션/키를 추가하세요.
 5. `src/auth.ts`의 로그인 응답 타입과 서버 계약을 실제 백엔드에 맞추세요.
 
 ## Working Checklist
@@ -131,4 +133,5 @@ src/
 - 브라우저에서는 appLogin이 동작하지 않습니다. 실제 로그인 테스트는 Toss WebView 또는 Sandbox 앱에서 하세요.
 - 비게임 WebView 앱은 공식 가이드 기준 `@toss/tds-mobile` 사용이 사실상 필수입니다.
 - 디버그 런타임 모드를 바꾸면 토큰을 정리하고 초기 화면으로 되돌립니다.
+- `/debug`에서는 브리지 Storage와 localStorage에 저장된 핵심 키를 나란히 확인할 수 있습니다.
 - 템플릿은 최소 동작만 제공합니다. 백엔드 API 계약과 도메인 로직은 직접 채워야 합니다.

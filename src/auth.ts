@@ -12,7 +12,7 @@ import { captureAppError } from './monitoring'
 import { createAppError, getErrorEventId } from './utils/appError'
 import { getEnvString } from './utils/env'
 
-const AUTH_TOKEN_STORAGE_KEY = 'ait_boilerplate_auth_token'
+export const AUTH_TOKEN_STORAGE_KEY = 'ait_boilerplate_auth_token'
 const AUTH_FLOW_CANCELLED_ERROR_NAME = 'AuthFlowCancelledError'
 const AUTH_FLOW_CANCELLED_MARKER = '__aitBoilerplateAuthFlowCancelled'
 
@@ -128,7 +128,7 @@ function withRawErrorMessage(base: string, rawMessage: string) {
   return `${base} (원문: ${trimmed})`
 }
 
-function getRuntimeContextLabel() {
+export function getRuntimeContextLabel() {
   const deploymentId = getDeploymentIdSafe() || 'unknown'
   const host = typeof window === 'undefined' ? 'server' : window.location.host
   return `deploymentId=${deploymentId}, host=${host}`

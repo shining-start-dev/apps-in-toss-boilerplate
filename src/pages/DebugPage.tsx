@@ -2,36 +2,49 @@ import { Button, Paragraph } from '@toss/tds-mobile'
 import { colors } from '@toss/tds-colors'
 import { Page, Screen } from '../components/Layout'
 import { InfoCard } from '../components/InfoCard'
+import type { DebugStorageEntry } from '../debugStorage'
 import type { DebugRuntimeMode, ResolvedOperationalEnvironment } from '../debugRuntimeMode'
 
 type DebugPageProps = {
+  currentPathname: string
   authTokenStatus: 'present' | 'empty'
   authTokenPreview: string | null
   authErrorMessage: string | null
+  runtimeContextLabel: string
   debugRuntimeMode: DebugRuntimeMode
   resolvedRuntimeMode: 'live' | 'dev'
   resolvedOperationalEnvironment: ResolvedOperationalEnvironment
+  storageEntries: DebugStorageEntry[]
+  storageErrorMessage: string | null
   isLoading: boolean
   isMutating: boolean
   onRefresh: () => void
   onRunAppLogin: () => void
   onClearAuthToken: () => void
   onSetDebugRuntimeMode: (mode: DebugRuntimeMode) => void
+  onClearStorageKey: (key: string) => void
+  onClearAllStorage: () => void
 }
 
 export function DebugPage({
+  currentPathname,
   authTokenStatus,
   authTokenPreview,
   authErrorMessage,
+  runtimeContextLabel,
   debugRuntimeMode,
   resolvedRuntimeMode,
   resolvedOperationalEnvironment,
+  storageEntries,
+  storageErrorMessage,
   isLoading,
   isMutating,
   onRefresh,
   onRunAppLogin,
   onClearAuthToken,
   onSetDebugRuntimeMode,
+  onClearStorageKey,
+  onClearAllStorage,
 }: DebugPageProps) {
   const isBusy = isLoading || isMutating
 
@@ -131,6 +144,28 @@ export function DebugPage({
             </div>
           </InfoCard>
 
+          <InfoCard
+            title="런타임 컨텍스트"
+            description="현재 경로와 WebView 컨텍스트를 한 번에 확인합니다."
+            statusLabel={resolvedOperationalEnvironment}
+            statusTone={resolvedRuntimeMode === 'live' ? 'success' : 'warning'}
+          >
+            <div className="boilerplate-grid">
+              <div className="boilerplate-metric">
+                <span className="boilerplate-metric-label">environment</span>
+                <span className="boilerplate-metric-value">{resolvedOperationalEnvironment}</span>
+              </div>
+              <div className="boilerplate-metric">
+                <span className="boilerplate-metric-label">current path</span>
+                <span className="boilerplate-metric-value">{currentPathname}</span>
+              </div>
+              <div className="boilerplate-metric" style={{ gridColumn: '1 / -1' }}>
+                <span className="boilerplate-metric-label">runtime context</span>
+                <span className="boilerplate-metric-value">{runtimeContextLabel}</span>
+              </div>
+            </div>
+          </InfoCard>
+
           <InfoCard title="운영용 체크리스트" description="초기 프로젝트에서 자주 확인하는 항목입니다.">
             <div className="boilerplate-route-list">
               <div className="boilerplate-route-item">
@@ -153,10 +188,71 @@ export function DebugPage({
             </div>
           </InfoCard>
 
+          <InfoCard
+            title="스토리지"
+            description="브리지 Storage와 localStorage에 남아 있는 핵심 키를 비교합니다."
+            statusLabel={storageEntries.length > 0 ? `${storageEntries.length} keys` : 'empty'}
+            statusTone="neutral"
+          >
+            <div className="boilerplate-route-list">
+              {storageEntries.length === 0 ? (
+                <div className="boilerplate-route-item">
+                  <span>표시할 저장 항목이 없어요.</span>
+                  <span>-</span>
+                </div>
+              ) : (
+                storageEntries.map((entry) => (
+                  <div className="boilerplate-storage-card" key={entry.key}>
+                    <div className="boilerplate-storage-head">
+                      <span className="boilerplate-storage-key">{entry.key}</span>
+                      <Button
+                        color="primary"
+                        variant="weak"
+                        disabled={isBusy}
+                        onClick={() => onClearStorageKey(entry.key)}
+                      >
+                        삭제
+                      </Button>
+                    </div>
+                    <div className="boilerplate-grid">
+                      <div className="boilerplate-metric">
+                        <span className="boilerplate-metric-label">local</span>
+                        <span className="boilerplate-metric-value">
+                          {entry.localValue ?? 'null'}
+                        </span>
+                      </div>
+                      <div className="boilerplate-metric">
+                        <span className="boilerplate-metric-label">bridge</span>
+                        <span className="boilerplate-metric-value">
+                          {entry.bridgeValue ?? 'null'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+            <div className="boilerplate-actions" style={{ marginTop: 10 }}>
+              <Button color="primary" variant="weak" disabled={isBusy} onClick={onClearAllStorage}>
+                전체 초기화
+              </Button>
+              <Button color="primary" variant="weak" disabled={isBusy} onClick={() => void onRefresh()}>
+                다시 읽기
+              </Button>
+            </div>
+          </InfoCard>
+
           {authErrorMessage ? (
             <div className="boilerplate-note">
               <strong style={{ display: 'block', marginBottom: 4 }}>최근 인증 오류</strong>
               <span>{authErrorMessage}</span>
+            </div>
+          ) : null}
+
+          {storageErrorMessage ? (
+            <div className="boilerplate-note">
+              <strong style={{ display: 'block', marginBottom: 4 }}>최근 스토리지 오류</strong>
+              <span>{storageErrorMessage}</span>
             </div>
           ) : null}
         </div>

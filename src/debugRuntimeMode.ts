@@ -1,7 +1,7 @@
 import { getOperationalEnvironment } from '@apps-in-toss/web-framework'
 import { ENABLE_DEBUG_TOOLS } from './debugTools'
 
-const DEBUG_RUNTIME_MODE_STORAGE_KEY = 'ait_boilerplate_debug_runtime_mode'
+export const DEBUG_RUNTIME_MODE_STORAGE_KEY = 'ait_boilerplate_debug_runtime_mode'
 
 export type DebugRuntimeMode = 'auto' | 'live' | 'dev'
 export type ResolvedOperationalEnvironment = 'toss' | 'sandbox' | 'local'

@@ -180,6 +180,28 @@
   border: 1px solid rgba(226, 232, 240, 0.9);
 }
 
+.boilerplate-storage-card {
+  padding: 14px;
+  border-radius: 18px;
+  background: #f8fafc;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+.boilerplate-storage-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.boilerplate-storage-key {
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 800;
+  word-break: break-all;
+}
+
 .boilerplate-error-screen {
   min-height: 100dvh;
   display: flex;
