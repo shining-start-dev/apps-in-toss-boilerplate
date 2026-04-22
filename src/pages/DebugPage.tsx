@@ -1,5 +1,6 @@
 import { Button, Paragraph } from '@toss/tds-mobile'
 import { colors } from '@toss/tds-colors'
+import type { AnonymousKeyReadResult } from '../anonymousKey'
 import { Page, Screen } from '../components/Layout'
 import { InfoCard } from '../components/InfoCard'
 import type { DebugStorageEntry } from '../debugStorage'
@@ -9,6 +10,7 @@ type DebugPageProps = {
   currentPathname: string
   authTokenStatus: 'present' | 'empty'
   authTokenPreview: string | null
+  anonymousKeyResult: AnonymousKeyReadResult
   authErrorMessage: string | null
   runtimeContextLabel: string
   debugRuntimeMode: DebugRuntimeMode
@@ -30,6 +32,7 @@ export function DebugPage({
   currentPathname,
   authTokenStatus,
   authTokenPreview,
+  anonymousKeyResult,
   authErrorMessage,
   runtimeContextLabel,
   debugRuntimeMode,
@@ -47,6 +50,26 @@ export function DebugPage({
   onClearAllStorage,
 }: DebugPageProps) {
   const isBusy = isLoading || isMutating
+  const anonymousKeyStatusLabel =
+    anonymousKeyResult.status === 'available'
+      ? 'available'
+      : anonymousKeyResult.status === 'browser'
+        ? 'browser'
+        : anonymousKeyResult.status
+  const anonymousKeyTone =
+    anonymousKeyResult.status === 'available'
+      ? 'success'
+      : anonymousKeyResult.status === 'error'
+        ? 'warning'
+        : 'neutral'
+  const anonymousKeyDescription =
+    anonymousKeyResult.status === 'available'
+      ? '비게임 앱 내부 식별용 키가 확인됐습니다.'
+      : anonymousKeyResult.status === 'browser'
+        ? '브라우저 미리보기에서는 브리지 기반 유저 키를 받을 수 없습니다.'
+        : anonymousKeyResult.status === 'unsupported'
+          ? 'SDK 2.4.5+ 또는 지원 앱 버전에서만 동작합니다.'
+          : anonymousKeyResult.message
 
   return (
     <Screen>
@@ -142,6 +165,29 @@ export function DebugPage({
                 토큰 삭제
               </Button>
             </div>
+          </InfoCard>
+
+          <InfoCard
+            title="비게임 유저 키"
+            description="`getAnonymousKey`는 로그인 토큰이 아니라 비게임 미니앱 내부 식별용 키입니다."
+            statusLabel={anonymousKeyStatusLabel}
+            statusTone={anonymousKeyTone}
+          >
+            <div className="boilerplate-grid">
+              <div className="boilerplate-metric">
+                <span className="boilerplate-metric-label">상태</span>
+                <span className="boilerplate-metric-value">{anonymousKeyStatusLabel}</span>
+              </div>
+              <div className="boilerplate-metric">
+                <span className="boilerplate-metric-label">키 미리보기</span>
+                <span className="boilerplate-metric-value">
+                  {anonymousKeyResult.status === 'available' ? anonymousKeyResult.hash : '없음'}
+                </span>
+              </div>
+            </div>
+            <Paragraph typography="t7" color={colors.grey600} style={{ margin: '10px 0 0' }}>
+              {anonymousKeyDescription}
+            </Paragraph>
           </InfoCard>
 
           <InfoCard

@@ -79,4 +79,8 @@ export default defineConfig({
   webViewProps: {
     type: 'partner',
   },
+  navigationBar: {
+    withBackButton: true,
+    withHomeButton: true,
+  },
 })

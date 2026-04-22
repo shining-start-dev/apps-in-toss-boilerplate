@@ -9,6 +9,11 @@ import {
   runAuthJoinFlow,
 } from './auth'
 import {
+  readAnonymousKeyStatus,
+  toAnonymousKeyPreview,
+  type AnonymousKeyReadResult,
+} from './anonymousKey'
+import {
   type DebugRuntimeMode,
   getResolvedOperationalEnvironment,
   getResolvedRuntimeMode,
@@ -57,6 +62,9 @@ export default function App() {
   const [runtimeContextLabel, setRuntimeContextLabel] = useState('')
   const [debugStorageEntries, setDebugStorageEntries] = useState<DebugStorageEntry[]>([])
   const [debugStorageErrorMessage, setDebugStorageErrorMessage] = useState<string | null>(null)
+  const [anonymousKeyResult, setAnonymousKeyResult] = useState<AnonymousKeyReadResult>({
+    status: 'browser',
+  })
 
   async function refreshAuthState(options: { loading?: boolean } = {}) {
     if (options.loading !== false) {
@@ -65,12 +73,22 @@ export default function App() {
 
     try {
       const token = await readAuthToken()
+      const nextAnonymousKeyResult = await readAnonymousKeyStatus()
+
       setAuthTokenStatus(token === null ? 'empty' : 'present')
       setAuthTokenPreview(toTokenPreview(token))
       setDebugRuntimeMode(readDebugRuntimeMode())
       setRuntimeContextLabel(getRuntimeContextLabel())
       setDebugStorageEntries(await getDebugStorageEntries())
       setDebugStorageErrorMessage(null)
+      setAnonymousKeyResult(
+        nextAnonymousKeyResult.status === 'available'
+          ? {
+              status: 'available',
+              hash: toAnonymousKeyPreview(nextAnonymousKeyResult.hash),
+            }
+          : nextAnonymousKeyResult,
+      )
     } catch (error) {
       const nextMessage =
         error instanceof Error ? error.message : '디버그 상태를 불러오지 못했어요. 다시 시도해 주세요.'
@@ -235,6 +253,7 @@ export default function App() {
             <DebugPage
               authTokenStatus={authTokenStatus}
               authTokenPreview={authTokenPreview}
+              anonymousKeyResult={anonymousKeyResult}
               authErrorMessage={authErrorMessage}
               runtimeContextLabel={runtimeContextLabel}
               debugRuntimeMode={debugRuntimeMode}

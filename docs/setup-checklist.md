@@ -7,6 +7,8 @@
 - WebView 시작 가이드: https://developers-apps-in-toss.toss.im/tutorials/webview.md
 - 공통 설정 (`granite.config.ts`): https://developers-apps-in-toss.toss.im/bedrock/reference/framework/UI/Config.md
 - `appLogin`: https://developers-apps-in-toss.toss.im/bedrock/reference/framework/로그인/appLogin.md
+- `getAnonymousKey`: https://developers-apps-in-toss.toss.im/bedrock/reference/framework/비게임/getAnonymousKey.md
+- 내비게이션 바 설정: https://developers-apps-in-toss.toss.im/bedrock/reference/framework/UI/NavigationBar.md
 
 2026년 3월 23일 기준 공식 문서에는 Apps in Toss 파트너사가 SDK 2.x로 마이그레이션해야 한다고 안내되어 있습니다. 이 보일러플레이트도 그 기준에 맞춰 `@apps-in-toss/web-framework` 2.x 계열을 사용합니다.
 
@@ -18,11 +20,13 @@
   - `brand.displayName`도 콘솔 기준 사용자 노출 이름과 맞추는 것이 안전함
 - `src/api/endpoints.ts`의 엔드포인트 경로를 실제 서버 계약에 맞게 변경
 - `src/auth.ts`의 로그인 응답 타입과 로그인 API 계약 확인
+- 비게임 앱이면 `src/anonymousKey.ts`의 `getAnonymousKey` 활용 여부 확인
 - `README.md` 상단 설명을 서비스 설명으로 교체
 - `public/favicon.svg`를 서비스 아이콘으로 교체
 - `granite.config.ts`의 `webViewProps.type`이 서비스 성격에 맞는지 확인
   - 비게임: `partner`
   - 게임: `game`
+- `granite.config.ts`의 `navigationBar`가 서비스 플로우와 맞는지 확인
 
 ## 2. 환경 변수 세팅
 
@@ -99,12 +103,19 @@ Sandbox 앱에서 확인할 것:
 - `appLogin`이 `DEFAULT` 흐름으로 서버에 전달되는지 확인
 - `getOperationalEnvironment()`가 기대값으로 잡히는지 확인
 - bridge provider(`TDSMobileAITProvider`)가 제대로 동작하는지 확인
+- 비게임 앱이면 `getAnonymousKey`가 기대한 형식의 키를 반환하는지 확인
 
 `appLogin` 공식 문서 기준 주의사항:
 
 - 클라이언트는 `authorizationCode`와 `referrer`만 받음
 - 토큰 교환과 사용자 정보 조회는 반드시 서버에서 처리해야 함
 - `authorizationCode`는 유효시간이 짧고 일회성이므로 클라이언트에 장기 저장하면 안 됨
+
+`getAnonymousKey` 공식 문서 기준 주의사항:
+
+- 비게임 미니앱에서만 사용
+- SDK 2.4.5+ 또는 지원 앱 버전에서만 동작
+- 서버 API 호출용 키가 아니라 내부 식별/데이터 관리용 키
 
 ## 5. 디버그 툴에 꼭 넣어둘 것
 

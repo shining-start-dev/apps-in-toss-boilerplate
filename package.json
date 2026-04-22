@@ -20,7 +20,7 @@
     "deploy": "pnpm build && npx ait deploy"
   },
   "dependencies": {
-    "@apps-in-toss/web-framework": "^2.1.1",
+    "@apps-in-toss/web-framework": "^2.4.7",
     "@emotion/react": "^11.14.0",
     "@sentry/react": "^10.42.0",
     "@toss/tds-colors": "^0.1.0",

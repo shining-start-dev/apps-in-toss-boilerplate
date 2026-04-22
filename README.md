@@ -1,12 +1,14 @@
 # Apps in Toss Boilerplate
 
-`time-is-gold-react`의 단순한 앱 구조와 `today-survey`의 성숙한 개발/운영 설정을 합쳐 만든 Apps in Toss 스타터 레포입니다.
+`time-is-gold-react`의 앱 셸 구성과 `today-survey`의 운영형 설정을 합쳐 만든 Apps in Toss 스타터 레포입니다.
 
 공식 Apps in Toss 문서 기준으로 확인한 항목:
 
 - WebView 시작 가이드: https://developers-apps-in-toss.toss.im/tutorials/webview.md
 - 공통 설정 (`granite.config.ts`): https://developers-apps-in-toss.toss.im/bedrock/reference/framework/UI/Config.md
 - `appLogin`: https://developers-apps-in-toss.toss.im/bedrock/reference/framework/로그인/appLogin.md
+- `getAnonymousKey`: https://developers-apps-in-toss.toss.im/bedrock/reference/framework/비게임/getAnonymousKey.md
+- 내비게이션 바 설정: https://developers-apps-in-toss.toss.im/bedrock/reference/framework/UI/NavigationBar.md
 
 포함 내용:
 
@@ -14,6 +16,7 @@
 - Apps in Toss Web Framework 연동
 - TDS Mobile / TDS Mobile AIT Provider
 - appLogin 기반 인증 템플릿
+- 비게임 `getAnonymousKey` 확인용 디버그 템플릿
 - API 클라이언트 / 환경 변수 헬퍼
 - Sentry 모니터링 초기화 템플릿
 - 인앱 디버그 툴 (`/debug`)
@@ -115,6 +118,7 @@ src/
 - `granite.config.ts`의 `appName`은 Apps in Toss 콘솔에 등록한 앱 이름과 같아야 합니다.
 - `web.host`와 `web.commands.dev`는 샌드박스 앱에서 접속 가능한 주소와 명령으로 맞춰야 합니다.
 - Apps in Toss 파트너사는 2026년 3월 23일 이후 SDK 2.x로 빌드해야 합니다.
+- 이 보일러플레이트는 `@apps-in-toss/web-framework` 2.4.7 기준으로 맞췄습니다.
 
 ## Recommended MCP And Tools
 
@@ -131,6 +135,7 @@ src/
 ## Notes
 
 - 브라우저에서는 appLogin이 동작하지 않습니다. 실제 로그인 테스트는 Toss WebView 또는 Sandbox 앱에서 하세요.
+- `getAnonymousKey`는 비게임 앱 내부 식별용 키이며, 서버 토큰 교환이나 로그인 대체 수단으로 쓰면 안 됩니다.
 - 비게임 WebView 앱은 공식 가이드 기준 `@toss/tds-mobile` 사용이 사실상 필수입니다.
 - 디버그 런타임 모드를 바꾸면 토큰을 정리하고 초기 화면으로 되돌립니다.
 - `/debug`에서는 브리지 Storage와 localStorage에 저장된 핵심 키를 나란히 확인할 수 있습니다.
